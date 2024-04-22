@@ -1,0 +1,144 @@
+class CellPhone {
+    private String manufacturer;
+    private String model;
+    private int launchYear;
+    private String launchStatus;
+    private String dimensions;
+    private float weight;
+    private String simType;
+    private String displayType;
+    private float displaySize;
+    private String displayResolution;
+    private String featuresSensors;
+    private String os;
+
+    // Constructors
+    public CellPhone(String manufacturer, String model, int launchYear, String launchStatus,
+                     String dimensions, float weight, String simType, String displayType,
+                     float displaySize, String displayResolution, String featuresSensors, String os) {
+        this.manufacturer = manufacturer;
+        this.model = model;
+        this.launchYear = launchYear;
+        this.launchStatus = launchStatus;
+        this.dimensions = dimensions;
+        this.weight = weight;
+        this.simType = simType;
+        this.displayType = displayType;
+        this.displaySize = displaySize;
+        this.displayResolution = displayResolution;
+        this.featuresSensors = featuresSensors;
+        this.os = os;
+    }
+
+    // Getters and setters
+    // (Omitted for brevity)
+
+    // toString method
+    @Override
+    public String toString() {
+        return "CellPhone{" +
+                "manufacturer='" + manufacturer + '\'' +
+                ", model='" + model + '\'' +
+                ", launchYear=" + launchYear +
+                ", launchStatus='" + launchStatus + '\'' +
+                ", dimensions='" + dimensions + '\'' +
+                ", weight=" + weight +
+                ", simType='" + simType + '\'' +
+                ", displayType='" + displayType + '\'' +
+                ", displaySize=" + displaySize +
+                ", displayResolution='" + displayResolution + '\'' +
+                ", featuresSensors='" + featuresSensors + '\'' +
+                ", os='" + os + '\'' +
+                '}';
+    }
+}
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class CellPhoneAnalyzer {
+
+    public static List<CellPhone> readCellPhonesFromCSV(String filename) {
+        List<CellPhone> cellPhones = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+
+                String manufacturer = parts[0].isEmpty() ? null : parts[0];
+                String model = parts[1].isEmpty() ? null : parts[1];
+                int launchYear = extractYear(parts[2]);
+                String launchStatus = parts[3].isEmpty() ? null : parts[3];
+                String dimensions = parts[4].isEmpty() ? null : parts[4];
+                float weight = extractWeight(parts[5]);
+                String simType = parts[6].isEmpty() ? null : parts[6];
+                String displayType = parts[7].isEmpty() ? null : parts[7];
+                float displaySize = extractDisplaySize(parts[8]);
+                String displayResolution = parts[9].isEmpty() ? null : parts[9];
+                String featuresSensors = parts[10].isEmpty() ? null : parts[10];
+                String os = extractOs(parts[11]);
+
+                CellPhone cellPhone = new CellPhone(manufacturer, model, launchYear, launchStatus,
+                        dimensions, weight, simType, displayType, displaySize, displayResolution,
+                        featuresSensors, os);
+
+                cellPhones.add(cellPhone);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return cellPhones;
+    }
+
+    private static int extractYear(String yearStr) {
+        if (yearStr.matches(".*\\d{4}.*")) {
+            Pattern pattern = Pattern.compile("\\b(\\d{4})\\b");
+            Matcher matcher = pattern.matcher(yearStr);
+            if (matcher.find()) {
+                return Integer.parseInt(matcher.group(1));
+            }
+        }
+        return -1; // Indicates invalid year
+    }
+
+    private static float extractWeight(String weightStr) {
+        if (weightStr.matches(".*\\d+ g.*")) {
+            Pattern pattern = Pattern.compile("(\\d+) g.*");
+            Matcher matcher = pattern.matcher(weightStr);
+            if (matcher.find()) {
+                return Float.parseFloat(matcher.group(1));
+            }
+        }
+        return -1; // Indicates invalid weight
+    }
+
+    private static float extractDisplaySize(String sizeStr) {
+        if (sizeStr.matches(".*\\d+(\\.\\d+)? inches.*")) {
+            Pattern pattern = Pattern.compile("(\\d+(\\.\\d+)?) inches.*");
+            Matcher matcher = pattern.matcher(sizeStr);
+            if (matcher.find()) {
+                return Float.parseFloat(matcher.group(1));
+            }
+        }
+        return -1; // Indicates invalid display size
+    }
+
+    private static String extractOs(String osStr) {
+        // Perform any additional cleaning or transformation if needed
+        return osStr;
+    }
+
+    public static void main(String[] args) {
+        List<CellPhone> cellPhones = readCellPhonesFromCSV("cells.csv");
+
+        // Do further processing or analysis with cellPhones list
+        // For example, printing the details of each cell phone
+        for (CellPhone cellPhone : cellPhones) {
+            System.out.println(cellPhone);
+        }
+    }
+}
